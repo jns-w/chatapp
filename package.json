@@ -1,0 +1,11 @@
+{
+  "name": "chatapp",
+  "version": "1.0.0",
+  "main": "/server/server.js",
+  "repository": "https://github.com/jns-w/chatapp.git",
+  "author": "jnsw <jns.w@icloud.com>",
+  "license": "MIT",
+  "dependencies": {
+    "prettier": "^2.2.1"
+  }
+}
