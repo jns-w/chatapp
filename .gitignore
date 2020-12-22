@@ -103,7 +103,7 @@ dist
 # TernJS port file
 .tern-port
 
-# Pycharm IDE file
+# Pycha rm IDE file
 .idea
 *.css
 *.css.map
