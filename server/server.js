@@ -7,10 +7,11 @@ const cors = require('cors')
 const passport = require('./lib/auth')
 
 const io = require('socket.io')
-// app.use(server.json())
+app.use(express.json())
 app.use(cors())
 
 app.use('/api/chat', require('./routes/chats.routes'))
+app.use('/api/user', require('./routes/user.routes'))
 
 // io.on('connection', socket => { /* ... */ })
 

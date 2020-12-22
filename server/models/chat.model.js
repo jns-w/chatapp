@@ -4,15 +4,18 @@ const {Schema} = mongoose;
 
 const messageSchema = new Schema(
   {
-    username: String,
-    message: String,
+    sender: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User"
+    },
+    content: String,
   },
   {
     timestamps: true,
   }
 );
 
-const chatroomSchema = new Schema({
+const chatSchema = new Schema({
   name: {
     type: String,
     required: true,
@@ -21,6 +24,6 @@ const chatroomSchema = new Schema({
   messages: [messageSchema],
 });
 
-chatroomSchema.pre('save', function (next) {
-  const chatroom = this;
-});
+const Chat = mongoose.model('Chat', chatSchema)
+
+module.exports = Chat
