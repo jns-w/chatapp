@@ -1,26 +1,26 @@
-const mongoose = require('mongoose')
-const {Schema} = mongoose
+const mongoose = require('mongoose');
 
+const {Schema} = mongoose;
 
-const messageSchema = new Schema({
-  username: String,
-  message: String,
-},
-{
-  timestamps: true
-}
-)
+const messageSchema = new Schema(
+  {
+    username: String,
+    message: String,
+  },
+  {
+    timestamps: true,
+  }
+);
 
 const chatroomSchema = new Schema({
   name: {
     type: String,
     required: true,
-    default: 'chatroom'
+    default: 'chatroom',
   },
-  messages: [messageSchema]
-})
+  messages: [messageSchema],
+});
 
 chatroomSchema.pre('save', function (next) {
-  let chatroom = this;
-
-})
+  const chatroom = this;
+});

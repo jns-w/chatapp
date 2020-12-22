@@ -3,7 +3,7 @@ const e = require('express')
 const User = require('../models/user.model')
 const Chatroom = require('../models/chatroom.model')
 
-router.get('/:chatid', async (req, res)=> {
+router.get('/:chatid', async (req, res) => {
   try {
     let user = User.findOne({username: req.username})
     let chatroom = Chatroom.findOne({_id: req.params.chatid})
