@@ -47,9 +47,9 @@ function Home({user, setUser}) {
   }
 
   return (
-    <div>
+    <div className="home-container">
       {render}
-      {chatrooms ? chatrooms.map((chat)=>(<NavLink to={`/chat/${chat._id}`}>{chat.name}</NavLink>)) : ""}
+      {chatrooms && user ? chatrooms.map((chat)=>(<NavLink to={`/chat/${chat._id}`}>{chat.name}</NavLink>)) : ""}
       <button onClick={createNewChat}>Create new</button>
     </div>
   );
