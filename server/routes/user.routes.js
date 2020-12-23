@@ -27,16 +27,31 @@ router.get('/', async (req, res) => {
 router.put('/new', async (req, res) => {
   try {
     let {username} = req.body
-    console.log(username)
     let newUser = new User({
       username: username
     })
     await newUser.save()
-    let token = await jwt.sign({username: username, id: newUser._id}, process.env.SECRET)
+    let token = await jwt.sign({id: newUser._id}, process.env.SECRET)
     res.status(200).json({msg: "user created", token: token})
   } catch (err) {
     console.log(err)
     res.status(400).json({msg: "error"})
+  }
+})
+
+/**
+ * @METHOD PUT
+ * @USE GET USERNAME
+ * @URL /api/user/getusername
+ */
+router.put('/getusername', async (req, res) => {
+  try {
+    let {token} = req.body
+    let decodedToken = jwt.decode(token)
+    let user = await User.findById(decodedToken.id)
+    res.status(200).json({msg: "success", username: user.username})
+  } catch (err) {
+    res.status(400)
   }
 })
 

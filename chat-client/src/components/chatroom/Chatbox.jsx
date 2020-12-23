@@ -108,7 +108,6 @@ function Chatbox({user}) {
 
 
       <div className="chat-bottom-div">
-
         <div className="chat-notif-div">
           {/*{userTyping ? <p>a participant is typing..</p> : ""}*/}
         </div>
