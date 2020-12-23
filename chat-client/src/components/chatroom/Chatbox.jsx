@@ -1,4 +1,4 @@
-import React, {useState, useEffect, useRef} from 'react';
+import React, {useState, useEffect, useRef, useCallback} from 'react';
 import {useParams} from 'react-router-dom'
 import {get, post} from '../../utils/requests'
 import PropTypes from 'prop-types'
@@ -6,11 +6,15 @@ import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faArrowUp} from '@fortawesome/free-solid-svg-icons';
 import {browserName} from 'react-device-detect'
 import {debounce} from 'throttle-debounce'
+import socketIOClient from 'socket.io-client'
+
+const MESSAGE_EVENT = "newChatMessage"
 
 function Chatbox({user}) {
   const {chatid} = useParams()
   const [inputField, setInputField] = useState("")
   const [chat, setChat] = useState([])
+  const socketRef = useRef()
 
   // const debouncedTypingState = debounce(3000, setUserTyping)
   // const debouncedTypingTrigger = debounce(3000, typingTrigger)
@@ -19,18 +23,25 @@ function Chatbox({user}) {
   const messagesEndRef = useRef(null)
 
   const scrollToBottom = () => {
-    if (browserName === 'Chrome') {
+    if (browserName === 'Chrome' || browserName === 'Firefox') {
       messagesEndRef.current.scrollIntoView({behavior: "smooth", block: 'nearest', inline: 'start'})
     } else if (browserName === 'Safari') {
       messagesEndRef.current.scrollIntoView()
     }
   }
 
-  async function getMessages() {
+  // async function getMessages() {
+  //   let data = await get(`/api/chat/${chatid}`)
+  //   setChat(data.chat.messages)
+  //   scrollToBottom()
+  // }
+
+  const getMessages = useCallback(async () => {
     let data = await get(`/api/chat/${chatid}`)
     setChat(data.chat.messages)
     scrollToBottom()
-  }
+  }, [chatid])
+
 
   function inputHandler(e) {
     setInputField(e.target.value)
@@ -50,13 +61,16 @@ function Chatbox({user}) {
   }
 
   async function sendMessage() {
-    let res = await post(`/api/chat/${chatid}/message`, {
-      senderid: user.id,
-      content: chatField.current
-    })
-    if (res) {
-      setInputField('')
-      await getMessages()
+    if (inputField) {
+      let res = await post(`/api/chat/${chatid}/message`, {
+        senderid: user.id,
+        content: inputField
+      })
+      if (res) {
+        setInputField('')
+        socketRef.current.emit(MESSAGE_EVENT, {chatid})
+        // await getMessages()
+      }
     }
   }
 
@@ -86,8 +100,27 @@ function Chatbox({user}) {
   }
 
   useEffect(() => {
+    if (user.username) {
+      // create websocket connection
+      socketRef.current = socketIOClient(process.env.SERVER, {
+        query: {user: user.username, chatid: chatid}
+      })
+
+      socketRef.current.on(MESSAGE_EVENT, () => {
+        console.log('received')
+        getMessages()
+      })
+    }
+    return () => {
+      if (socketRef.current) {
+        socketRef.current.disconnect()
+      }
+    }
+  }, [chatid, user])
+
+  useEffect(() => {
     getMessages()
-  }, [])
+  }, [getMessages])
 
   useEffect(() => {
     renderMessages()
@@ -96,7 +129,7 @@ function Chatbox({user}) {
 
 
   return (
-    <div className="chatbox-div">
+    <div className="chatbox">
       <h3>Chatbox</h3>
 
       <div className="messages-scroll-wrapper">
@@ -121,6 +154,10 @@ function Chatbox({user}) {
       </div>
     </div>
   );
+}
+
+Chatbox.propTypes = {
+  user: PropTypes.object,
 }
 
 export default Chatbox;
