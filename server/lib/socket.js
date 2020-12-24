@@ -16,8 +16,8 @@ function socket(io) {
           case 'chat':
             client.join(data.chatid)
             console.log(`${data.user.username} has joined the chat`)
-            client.to(data.chatid).emit(CHAT_USER_EVENT, {joined: data.user.username})
             await addActive(data.user.id, data.chatid)
+            client.to(data.chatid).emit(CHAT_USER_EVENT, {joined: data.user.username})
             break
           case 'chat-list':
             client.join('chat-list')
@@ -32,8 +32,8 @@ function socket(io) {
         case 'chat':
           client.leave(data.chatid)
           console.log(`${data.user.username} has unsubscribed from chat`)
-          client.to(data.chatid).emit(CHAT_USER_EVENT, {left: data.user.username})
           await removeActive(data.user.id, data.chatid)
+          client.to(data.chatid).emit(CHAT_USER_EVENT, {left: data.user.username})
           break
         case 'chat-list':
           client.leave('chat-list')
