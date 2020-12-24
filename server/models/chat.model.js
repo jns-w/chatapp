@@ -22,7 +22,22 @@ const chatSchema = new Schema({
     default: 'chatroom',
   },
   messages: [messageSchema],
+  activeUsers: [{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
+  }
+  ]
 });
+
+// chatSchema.methods.updateActive = async function (userID) {
+//   try {
+//     this.activeUsers.push(userID)
+//     console.log(`current active users`, chat.activeUsers)
+//   } catch (err) {
+//     console.log(err)
+//     return false
+//   }
+// }
 
 const Chat = mongoose.model('Chat', chatSchema)
 

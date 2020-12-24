@@ -1,20 +1,23 @@
+const Chat = require('../models/chat.model')
 const {validToken} = require('./jwt')
 const MESSAGE_EVENT = 'message-event'
 const CHAT_LIST_EVENT = 'chat-list-event'
 const CHAT_USER_EVENT = 'chat-user-event'
+
 
 function socket(io) {
   io.on('connection', (client) => {
     // join chat
     const {chatid, user, token} = client.handshake.query
     // SUBSCRIBE
-    client.on('subscribe', function (data) {
-      if (validToken(data.token)) {
+    client.on('subscribe', async function (data) {
+      if (await validToken(data.token)) {
         switch (data.type) {
           case 'chat':
             client.join(data.chatid)
             console.log(`${data.user.username} has joined the chat`)
             client.to(data.chatid).emit(CHAT_USER_EVENT, {joined: data.user.username})
+            await addActive(data.user.id, data.chatid)
             break
           case 'chat-list':
             client.join('chat-list')
@@ -24,12 +27,13 @@ function socket(io) {
       }
     })
     // UNSUBSCRIBE
-    client.on('unsubscribe', function (data) {
+    client.on('unsubscribe', async function (data) {
       switch (data.type) {
         case 'chat':
           client.leave(data.chatid)
           console.log(`${data.user.username} has unsubscribed from chat`)
           client.to(data.chatid).emit(CHAT_USER_EVENT, {left: data.user.username})
+          await removeActive(data.user.id, data.chatid)
           break
         case 'chat-list':
           client.leave('chat-list')
@@ -58,6 +62,30 @@ function socket(io) {
     })
 
   })
+}
+
+async function addActive(userID, chatID) {
+  try {
+    await Chat.findOneAndUpdate({'_id': chatID}, {
+      $push: {
+        activeUsers: userID
+      }
+    })
+  } catch (err) {
+    console.log(err)
+  }
+}
+
+async function removeActive(userID, chatID) {
+  try {
+    await Chat.findOneAndUpdate({'_id': chatID}, {
+      $pull: {
+        activeUsers: userID
+      }
+    })
+  } catch (err) {
+    console.log(err)
+  }
 }
 
 module.exports = socket
