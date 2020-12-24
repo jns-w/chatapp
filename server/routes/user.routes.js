@@ -47,7 +47,7 @@ router.put('/new', async (req, res) => {
 router.put('/getusername', async (req, res) => {
   try {
     let {token} = req.body
-    let decodedToken = jwt.decode(token)
+    let decodedToken = await jwt.verify(token, process.env.SECRET)
     let user = await User.findById(decodedToken.id)
     res.status(200).json({msg: "success", username: user.username})
   } catch (err) {

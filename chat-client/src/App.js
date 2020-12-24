@@ -4,7 +4,6 @@ import './styles/main.css';
 import Chatbox from "./components/chatroom/Chatbox";
 import Home from "./components/Home";
 import {tokenCheck} from "./utils/auth";
-const ENDPOINT = 'http://localhost:80'
 
 function App() {
   const [user, setUser] = useState({id: '', username: ''})

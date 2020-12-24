@@ -6,8 +6,8 @@ require('./lib/connection')
 const socket = require('./lib/socket')
 const cors = require('cors')
 
-const socketIo = require('socket.io');
-const io = socketIo(server)
+// const socketIo = require('socket.io');
+const io = require('socket.io')(server)
 
 app.use(express.json())
 app.use(cors())
